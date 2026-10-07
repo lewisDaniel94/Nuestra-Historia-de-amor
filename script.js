@@ -115,3 +115,14 @@ clickableImages.forEach(img => {
 function closeModal() {
     modal.classList.remove('show');
 }
+
+// --- DESBLOQUEO GLOBAL DE AUDIO CON EL PRIMER TOQUE ---
+document.addEventListener('click', function unlockAudio() {
+    if (audio.paused) {
+        audio.play().then(() => {
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+            // Una vez que arranca, removemos el evento para que no se dispare en cada clic
+            document.removeEventListener('click', unlockAudio);
+        }).catch(e => console.log("Esperando interacción para reproducir", e));
+    }
+}, { once: true });
