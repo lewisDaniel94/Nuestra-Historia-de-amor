@@ -15,61 +15,82 @@ body {
     min-height: 100vh;
 }
 
-/* Contenedor tipo pantalla de móvil */
 .mobile-container {
     width: 100%;
     max-width: 420px;
     background-color: #12100e;
     min-height: 100vh;
-    padding: 20px 16px 120px 16px;
+    padding: 0 16px 120px 16px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
     position: relative;
+    overflow-x: hidden;
 }
 
-/* Cabecera */
+/* Cabecera / Portada (Rectangular con fondo y texto superpuesto) */
 .hero-section {
-    text-align: center;
-    margin-top: 10px;
+    position: relative;
+    width: calc(100% + 32px);
+    margin-left: -16px;
+    height: 350px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
     margin-bottom: 24px;
-}
-
-.photo-frame {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto 16px auto;
-    border-radius: 50%;
     overflow: hidden;
-    border: 3px solid #ec4899;
-    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
 }
 
-.hero-img {
+.hero-bg-img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(18, 16, 14, 0.9), rgba(18, 16, 14, 0.2));
+    z-index: 2;
+}
+
+.hero-text-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
 }
 
 .couple-names {
-    font-size: 26px;
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .heart-icon {
     color: #ec4899;
+    margin: 0 4px;
 }
 
 .anniversary-date {
-    font-size: 13px;
-    background: rgba(236, 72, 153, 0.15);
-    display: inline-block;
-    padding: 6px 14px;
-    border-radius: 20px;
+    font-size: 14px;
+    background: rgba(236, 72, 153, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 30px;
     color: #f472b6;
-}
-
-.anniversary-date i {
-    margin-right: 4px;
+    font-weight: 500;
 }
 
 /* Contador */
@@ -240,7 +261,7 @@ body {
     border-radius: 6px;
 }
 
-/* Sección QR */
+/* Sección QR y Redes (Corregido el centrado) */
 .qr-section {
     background: #1c1917;
     border-radius: 20px;
@@ -265,8 +286,12 @@ body {
     background: #292524;
     padding: 16px;
     border-radius: 14px;
-    display: inline-block;
-    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px auto;
+    width: fit-content;
 }
 
 .qr-img {
@@ -316,7 +341,7 @@ body {
 .twitter { background-color: #000000; border: 1px solid #333; }
 .copy { background-color: #44403c; }
 
-/* Reproductor flotante de música */
+/* Reproductor de Música Flotante */
 .music-player-bar {
     position: fixed;
     bottom: 16px;
@@ -390,6 +415,49 @@ body {
     font-size: 12px;
 }
 
-.btn-sound {
-    background: #44403c !important;
+/* Estilos para el Modal de Imágenes (Efecto Zoom) */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+}
+
+.image-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    max-width: 90%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 12px;
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.image-modal.show .modal-content {
+    transform: scale(1);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    color: #fff;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
 }

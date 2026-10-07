@@ -1,68 +1,117 @@
 // --- CONTADOR DE TIEMPO TRANSCURRIDO ---
-// Cambia la fecha de inicio aquí (Año, Mes (0-11, ej: 11 es Diciembre), Día, Hora, Minuto)
-const startDate = new Date(2024, 11, 5, 0, 0, 0);
+// Fecha de inicio: 5 de noviembre de 2024 (Mes 10 = Noviembre, ya que enero es 0)
+const startDate = new Date(2024, 10, 5, 0, 0, 0);
 
 function updateCounter() {
     const now = new Date();
-    const diff = now - startDate;
-
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
     
-    // Cálculo aproximado de años y meses
-    const years = now.getFullYear() - startDate.getFullYear();
+    let years = now.getFullYear() - startDate.getFullYear();
     let months = now.getMonth() - startDate.getMonth();
-    
+    let days = now.getDate() - startDate.getDate();
+    let hours = now.getHours() - startDate.getHours();
+    let minutes = now.getMinutes() - startDate.getMinutes();
+
+    // Ajustar minutos negativos
+    if (minutes < 0) {
+        minutes += 60;
+        hours--;
+    }
+
+    // Ajustar horas negativas
+    if (hours < 0) {
+        hours += 24;
+        days--;
+    }
+
+    // Ajustar días negativos tomando los días del mes anterior
+    if (days < 0) {
+        months--;
+        const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += previousMonth.getDate();
+    }
+
+    // Ajustar meses negativos
     if (months < 0) {
         months += 12;
+        years--;
     }
-    
-    // Días transcurridos en el mes actual
-    const lastMonthDate = new Date(now.getFullYear(), now.getMonth(), startDate.getDate());
-    const currentDays = Math.floor((now - lastMonthDate) / (1000 * 60 * 60 * 24));
-    
-    const displayDays = currentDays >= 0 ? currentDays : 0;
-    const displayHours = hours % 24;
-    const displayMinutes = minutes % 60;
 
-    // Actualizar elementos en el HTML asegurando formato de 2 dígitos
+    // Mostrar los resultados en el HTML asegurando 2 dígitos
     document.getElementById('years').innerText = String(years).padStart(2, '0');
     document.getElementById('months').innerText = String(months).padStart(2, '0');
-    document.getElementById('days').innerText = String(displayDays).padStart(2, '0');
-    document.getElementById('hours').innerText = String(displayHours).padStart(2, '0');
-    document.getElementById('minutes').innerText = String(displayMinutes).padStart(2, '0');
+    document.getElementById('days').innerText = String(days).padStart(2, '0');
+    document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+    document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
 }
 
-// Ejecutar cada segundo
-setInterval(updateCounter, 1000);
+// Ejecutar inmediatamente y luego cada segundo
 updateCounter();
+setInterval(updateCounter, 1000);
 
 
-// --- REPRODUCTOR DE MÚSICA FLOTANTE ---
+// --- REPRODUCTOR DE MÚSICA AUTOMÁTICO Y CONTROLADOR ---
 const audio = document.getElementById('bgMusic');
 const playPauseBtn = document.getElementById('playPauseBtn');
-let isPlaying = false;
 
+// Intentar reproducir automáticamente al cargar la página
+window.addEventListener('DOMContentLoaded', () => {
+    audio.play().then(() => {
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    }).catch(error => {
+        console.log("Reproducción automática bloqueada por el navegador. Esperando interacción.");
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+    });
+});
+
+// Función para pausar o reproducir con el mismo botón
 function togglePlay() {
-    if (isPlaying) {
+    if (!audio.paused) {
         audio.pause();
         playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
     } else {
-        audio.play().catch(e => console.log("Reproducción automática bloqueada por el navegador."));
-        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        audio.play().then(() => {
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        }).catch(e => console.log("Error al reproducir:", e));
     }
-    isPlaying = !isPlaying;
 }
 
 
 // --- FUNCIONES EXTRA (Descarga y Copiar Enlace) ---
+// --- FUNCIÓN DE DESCARGA REAL DEL QR ---
 function downloadQR() {
-    alert("Aquí se descargará la imagen del código QR.");
+    const imageUrl = 'img/QR.png'; // Ruta de tu imagen QR
+    const fileName = 'codigo-qr-nuestra-historia.png'; // Nombre que tendrá el archivo al descargarse
+    
+    // Crear un enlace temporal para forzar la descarga en el navegador
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function copyLink() {
     navigator.clipboard.writeText(window.location.href);
     alert("¡Enlace copiado al portapapeles!");
+}
+
+// --- MODAL DE IMÁGENES (ZOOM / LIGHTBOX) ---
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImg');
+
+// Seleccionamos solo la foto de portada y los recuerdos (el QR ya no se amplía)
+const clickableImages = document.querySelectorAll('.hero-bg-img, .memory-card img');
+
+clickableImages.forEach(img => {
+    img.style.cursor = 'pointer'; // Cambia el cursor para indicar que se puede hacer clic
+    img.addEventListener('click', () => {
+        modal.classList.add('show');
+        modalImg.src = img.src;
+    });
+});
+
+// Función para cerrar el modal al hacer clic en el fondo o en la X
+function closeModal() {
+    modal.classList.remove('show');
 }
